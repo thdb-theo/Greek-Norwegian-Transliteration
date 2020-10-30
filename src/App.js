@@ -7,57 +7,55 @@ import russian_flag from './russian_flag.gif';
 import './App.css';
 import 'react-simple-keyboard/build/css/index.css';
 import { Greek, greek_acute, diaeresis, acute_diaresis } from './greek'
+import {Russian} from "./russian"
 import { greeklayout, russianlayout } from './layouts'
 
 class App extends Component {
   constructor(props) {
     super(props);
+    let greekTranscriber = new Greek("")
+    let russianTranscriber = new Russian("")
+
     this.state = {
       text: '',
       layoutName: "default",
       modifier: '',
       language: "",
-      greekTranscriber: new Greek(""),
-      russianTranscriber: null,
+      greekTranscriber: greekTranscriber,
+      russianTranscriber: russianTranscriber,
+      transcriber: greekTranscriber,
       title: "",
       undertitle: null,
       placeholder: null
     }
-    // this.toGreek()
   }
 
   componentDidMount() {
     this.toGreek()
   }
 
-  changeGreek = (event) => {
+  formOnChange = (event) => {
     this.setState({ text: event.target.value })
-    this.state.greekTranscriber.setString(event.target.value)
+    this.state.transcriber.setString(event.target.value)
   }
 
   KBonChange = (input) => {
     this.forceUpdate()
   }
 
-  KBonKeyPress = (button) => {
-    if (["{lock}", "{shift}"].includes(button)) {
-      this.handleShiftButton();
-      this.state.greekTranscriber.setString(this.state.text)
-      this.forceUpdate()
-      return;
-    }
+  accentStuff(button) {
     if (button === "΄") {
       this.setState({ modifier: "acute" })
-      return
+      return -1
     }
     if (button === "¨") {
       this.setState({ modifier: "diaeresis" })
-      return
+      return -1
     }
 
     if (button === "΅") {
       this.setState({ modifier: "acute_diaeresis" })
-      return
+      return -1
     }
 
     if (this.state.modifier === "acute" && button.toLowerCase() in greek_acute) {
@@ -81,22 +79,38 @@ class App extends Component {
       else
         button = accented
     }
+    return button
+  }
 
+  KBonKeyPress = (button) => {
+    if (["{lock}", "{shift}"].includes(button)) {
+      this.handleShiftButton();
+      this.state.transcriber.setString(this.state.text)
+      this.forceUpdate()
+      return;
+    }
+
+    if (this.state.language === "greek") {
+      button = this.accentStuff(button)
+      if (button == -1)
+        return
+    }
+  
     this.setState({ modifier: "" })
     if (button === "{space}")
       button = " "
     if (button === "{delete}") {
       this.setState({ text: "" })
-      this.state.greekTranscriber.setString("")
+      this.state.transcriber.setString("")
       this.forceUpdate()
       return
     }
     if (button === "{bksp}") {
       this.setState({ text: this.state.text.slice(0, -1) })
-      this.state.greekTranscriber.setString(this.state.text)
+      this.state.transcriber.setString(this.state.text)
     } else {
       this.setState({ text: this.state.text + button })
-      this.state.greekTranscriber.setString(this.state.text)
+      this.state.transcriber.setString(this.state.text)
     }
   }
   handleShiftButton = () => {
@@ -105,12 +119,15 @@ class App extends Component {
   };
 
   toGreek = () => {
+    
     this.setState({
       language: "greek",
       title: "Transliterasjon av nygresk",
       undertitle: "Μεταγραφής από το Ελληνικό στο Νορβηγός",
-      placeholder: "Dette er jo helt gresk!"
+      placeholder: "Skriv gresk her",
+      transcriber: this.state.greekTranscriber
     })
+    this.forceUpdate()
   }
 
   toRussian = () => {
@@ -118,7 +135,8 @@ class App extends Component {
       language: "russian",
       title: "Transliterasjon av russisk",
       undertitle: "транслитерация с русского на норвежский",
-      placeholder: "Russisk funker ikke ennå. Work in progress!"
+      placeholder: "Skriv russisk her",
+      transcriber: this.state.russianTranscriber
     })
   }
 
@@ -137,10 +155,10 @@ class App extends Component {
           <form>
             <input type="text"
               value={this.state.text}
-              onChange={this.changeGreek}
+              onChange={this.formOnChange}
               placeholder={this.state.placeholder} />
           </form>
-          <p>&nbsp;{this.state.greekTranscriber.norwegian()}</p>
+          <p>&nbsp;{this.state.transcriber.norwegian()}</p>
         </div>
         <Keyboard
           onChange={this.KBonChange}
