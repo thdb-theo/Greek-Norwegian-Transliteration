@@ -1,4 +1,18 @@
+.simple-keyboard.hg-layout-custom {
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  color: red;
+}
+
+.simple-keyboard .hg-button.hg-selectedButton {
+  background: rgba(5, 25, 70, 0.53);
+  color: rgb(146, 21, 21);
+}
+
 .App {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
+    Helvetica, Arial, "Lucida Grande", sans-serif;
+  margin: 0 auto;
   text-align: center;
 }
 
@@ -32,7 +46,7 @@
 }
 
 input[type=text]{
-  width: 50%;
+  width: 75%;
   text-align: center;
   font-size: 20px;
 }

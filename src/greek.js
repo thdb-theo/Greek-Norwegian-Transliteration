@@ -87,12 +87,10 @@ class Greek {
         if (this.i < this.gre_accent_idx) {
             this.accent_idx -= n - s.length
         }
-        console.log("adding", s, "accent now", this.accent_idx)
         this.i += n
     }
 
     norwegian() {
-        console.log("initial accent idx", this.accent_idx)
         if ((this.accented.match(/ /g) || []).length > 0) {
             // several words
             let original_accented = this.accented
@@ -140,7 +138,11 @@ class Greek {
             if (this.nextIsHiatus()) {
                 this.add("ay", 2);
             } else {
-                this.add("av", 2)
+                if (this.gre_accent_idx === this.i + 1) {
+                    this.add("av", 2, -1)
+                } else {
+                    this.add("av", 2)
+                }
             }
         } else {
             this.add("a", 1)
@@ -250,7 +252,6 @@ class Greek {
     }
 
     add_accent() {
-        console.log(this.accent_idx)
         if (this.accent_idx === -1) {
             return this.titleCase(this.nor)
         }

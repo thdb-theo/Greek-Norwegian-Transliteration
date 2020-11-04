@@ -9,6 +9,7 @@ import 'react-simple-keyboard/build/css/index.css';
 import { Greek, greek_acute, diaeresis, acute_diaresis } from './greek'
 import {Russian} from "./russian"
 import { greeklayout, russianlayout } from './layouts'
+import { russian_cities, greek_cities } from './cities'
 
 class App extends Component {
   constructor(props) {
@@ -26,7 +27,7 @@ class App extends Component {
       transcriber: greekTranscriber,
       title: "",
       undertitle: null,
-      placeholder: null
+      placeholder: null,
     }
   }
 
@@ -92,7 +93,7 @@ class App extends Component {
 
     if (this.state.language === "greek") {
       button = this.accentStuff(button)
-      if (button == -1)
+      if (button === -1)
         return
     }
   
@@ -119,23 +120,26 @@ class App extends Component {
   };
 
   toGreek = () => {
-    
+    let randidx = Math.floor(Math.random() * greek_cities.length)
+    let city = greek_cities[randidx]
     this.setState({
       language: "greek",
       title: "Transliterasjon av nygresk",
       undertitle: "Μεταγραφής από το Ελληνικό στο Νορβηγός",
-      placeholder: "Skriv gresk her",
+      placeholder: "Prøv f.eks.: " + city,
       transcriber: this.state.greekTranscriber
     })
     this.forceUpdate()
   }
 
   toRussian = () => {
+    let randidx = Math.floor(Math.random() * russian_cities.length)
+    let city = russian_cities[randidx]
     this.setState({
       language: "russian",
       title: "Transliterasjon av russisk",
       undertitle: "транслитерация с русского на норвежский",
-      placeholder: "Skriv russisk her",
+      placeholder: "Prøv f.eks.: " + city,
       transcriber: this.state.russianTranscriber
     })
   }
@@ -160,7 +164,8 @@ class App extends Component {
           </form>
           <p>&nbsp;{this.state.transcriber.norwegian()}</p>
         </div>
-        <Keyboard
+        <Keyboard 
+          className="simple-keyboard"
           onChange={this.KBonChange}
           onKeyPress={this.KBonKeyPress}
           layoutName={this.state.layoutName}
